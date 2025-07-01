@@ -1,12 +1,13 @@
 import morgan from 'morgan';
 import express from 'express';
 import cors from 'cors';
+import path from 'path';
+import { fileURLToPath } from 'url';
 
 const app = express();
 app.use(express.json());
 app.use(morgan('tiny'));
 app.use(cors());
-
 
 morgan(function (tokens, req, res) {
     return [
@@ -17,6 +18,8 @@ morgan(function (tokens, req, res) {
         tokens['response-time'](req, res), 'ms'
     ].join(' ')
 });
+
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 const persons = [
     {
@@ -41,12 +44,20 @@ const persons = [
     }
 ];
 
+// Servir archivos estáticos del frontend (dist)
+app.use(express.static(path.join(__dirname, 'dist')));
+
 app.get('/api/persons', (req, res) => {
     res.json(persons);
 });
 
 app.get('/', (req, res) => {
   res.send('API funcionando');
+});
+
+// Para cualquier otra ruta, servir index.html del frontend
+app.get('*', (req, res) => {
+  res.sendFile(path.join(__dirname, 'dist', 'index.html'));
 });
 
 const PORT = 3001;
