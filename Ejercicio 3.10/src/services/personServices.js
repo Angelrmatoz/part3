@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-const baseUrl = "https://part3-c82n.onrender.com";
+const baseUrl = "https://part3-c82n.onrender.com/api/persons"; // Updated base URL to match the new API endpoint
 
 const getAll = () => {
     return axios.get(baseUrl)

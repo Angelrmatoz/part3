@@ -13,11 +13,13 @@ const App = () => {
 
   const handleFilterChange = (event) => setFilterText(event.target.value);
 
-  const filteredPersons = persons.filter(
-    (person) =>
-      person.name &&
-      person.name.toLowerCase().includes(filterText.toLowerCase())
-  );
+  const filteredPersons = Array.isArray(persons)
+    ? persons.filter(
+        (person) =>
+          person.name &&
+          person.name.toLowerCase().includes(filterText.toLowerCase())
+      )
+    : [];
 
   const handleNameChange = (event) => {
     setNewName(event.target.value);
