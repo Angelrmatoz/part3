@@ -1,55 +1,32 @@
-const express = require('express')
-const app = express()
+const mongoose = require('mongoose')
 
-app.use(express.json())
+if (process.argv.length < 3) {
+    console.log('give password as argument')
+    process.exit(1)
+}
 
-let notes = [
-    {
-        id: 1,
-        content: "HTML is easy",
-        important: true
-    },
-    {
-        id: 2,
-        content: "Browser can execute only JavaScript",
-        important: false
-    },
-    {
-        id: 3,
-        content: "GET and POST are the most important methods of HTTP protocol",
-        important: true
-    }
-]
+const password = process.argv[2]
 
-app.get('/', (request, response) => {
-    response.send('<h1>Hello World!</h1>')
+const url =
+    `mongodb+srv://Angelrmatoz:${password}@cluster0.roqvqa2.mongodb.net/noteApp?retryWrites=true&w=majority`
+
+mongoose.set('strictQuery', false)
+
+mongoose.connect(url)
+
+const noteSchema = new mongoose.Schema({
+    content: String,
+    important: Boolean,
 })
 
-app.get('/api/notes/:id', (request, response) => {
-    const id = Number(request.params.id)
-    const note = notes.find(note => note.id === id)
+const Note = mongoose.model('Note', noteSchema)
 
-
-    if (note) {
-        response.json(note)
-    } else {
-        response.status(404).end()
-    }
+const note = new Note({
+    content: 'HTML is easy',
+    important: true,
 })
 
-app.delete('/api/notes/:id', (request, response) => {
-    const id = Number(request.params.id)
-    notes = notes.filter(note => note.id !== id)
-
-    response.status(204).end()
-})
-
-app.post('/api/notes', (request, response) => {
-    const note = request.body
-    console.log(note)
-    response.json(note)
-})
-
-const PORT = 3001
-app.listen(PORT)
-console.log(`Server running on port ${PORT}`)
+note.save().then(result => {
+    console.log('note saved!', result);
+    mongoose.connection.close();
+});
