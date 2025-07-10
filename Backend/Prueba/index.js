@@ -1,17 +1,12 @@
 const mongoose = require('mongoose')
 
-if (process.argv.length < 3) {
-    console.log('give password as argument')
-    process.exit(1)
-}
-
 const password = process.argv[2]
 
+// DO NOT SAVE YOUR PASSWORD TO GITHUB!!
 const url =
-    `mongodb+srv://Angelrmatoz:${password}@cluster0.roqvqa2.mongodb.net/noteApp?retryWrites=true&w=majority`
+    `mongodb+srv://fullstack:${password}@cluster0.o1opl.mongodb.net/?retryWrites=true&w=majority`
 
 mongoose.set('strictQuery', false)
-
 mongoose.connect(url)
 
 const noteSchema = new mongoose.Schema({
@@ -21,12 +16,8 @@ const noteSchema = new mongoose.Schema({
 
 const Note = mongoose.model('Note', noteSchema)
 
-const note = new Note({
-    content: 'HTML is easy',
-    important: true,
-})
-
-note.save().then(result => {
-    console.log('note saved!', result);
-    mongoose.connection.close();
-});
+app.get('/api/notes', (request, response) => {
+    Note.find({}).then(notes => {
+        response.json(notes)
+    })
+  })
