@@ -23,6 +23,15 @@ morgan(function (tokens, req, res) {
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
+const errorHandler = (error, request, response, next) => {
+    console.error(error.message);
+
+    if (error.name === 'CastError') {
+        return response.status(400).send({ error: 'malformatted id' });
+    }
+    next(error);
+}
+
 // Servir archivos estáticos del frontend (dist)
 app.use(express.static(path.join(__dirname, 'dist')));
 
@@ -49,9 +58,7 @@ app.delete('/api/persons/:id', (req, res) => {
         .then(() => {
             res.status(204).end();
         })
-        .catch(error => {
-            res.status(400).send({ error: 'malformatted id' }, error);
-        });
+        .catch(error => next(error));
 });
 
 app.get('/api/persons/:id', (req, res) => {
@@ -63,9 +70,7 @@ app.get('/api/persons/:id', (req, res) => {
                 res.status(404).end();
             }
         })
-        .catch(error => {
-            res.status(400).send({ error: 'malformatted id' }, error);
-        });
+        .catch(error => next(error));
 });
 
 // Para cualquier otra ruta, servir index.html del frontend
@@ -77,3 +82,5 @@ const PORT = 3001;
 app.listen(PORT, () => {
     console.log(`Server running on port ${PORT}`);
 });
+
+app.use(errorHandler);
